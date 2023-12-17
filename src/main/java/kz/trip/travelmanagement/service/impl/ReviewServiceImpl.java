@@ -1,11 +1,12 @@
 package kz.trip.travelmanagement.service.impl;
 
 import kz.trip.travelmanagement.dto.ReviewDto;
-import kz.trip.travelmanagement.exceptions.PokemonNotFoundException;
+import kz.trip.travelmanagement.exceptions.TourNotFoundException;
 import kz.trip.travelmanagement.exceptions.ReviewNotFoundException;
-import kz.trip.travelmanagement.models.Pokemon;
 import kz.trip.travelmanagement.models.Review;
-import kz.trip.travelmanagement.repository.PokemonRepository;
+import kz.trip.travelmanagement.models.Tour;
+import kz.trip.travelmanagement.models.Booking;
+import kz.trip.travelmanagement.repository.TourRepository;
 import kz.trip.travelmanagement.repository.ReviewRepository;
 import kz.trip.travelmanagement.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +18,21 @@ import java.util.stream.Collectors;
 @Service
 public class ReviewServiceImpl implements ReviewService {
     private ReviewRepository reviewRepository;
-    private PokemonRepository pokemonRepository;
+    private TourRepository tourRepository;
 
     @Autowired
-    public ReviewServiceImpl(ReviewRepository reviewRepository, PokemonRepository pokemonRepository) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, TourRepository tourRepository) {
         this.reviewRepository = reviewRepository;
-        this.pokemonRepository = pokemonRepository;
+        this.tourRepository = tourRepository;
     }
 
     @Override
     public ReviewDto createReview(int pokemonId, ReviewDto reviewDto) {
         Review review = mapToEntity(reviewDto);
 
-        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> new PokemonNotFoundException("Pokemon with associated review not found"));
+        Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
-        review.setPokemon(pokemon);
+        review.setTour(tour);
 
         Review newReview = reviewRepository.save(review);
 
@@ -39,19 +40,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDto> getReviewsByPokemonId(int id) {
-        List<Review> reviews = reviewRepository.findByPokemonId(id);
+    public List<ReviewDto> getReviewsByTourId(int id) {
+        List<Review> reviews = reviewRepository.findByTourId(id);
 
         return reviews.stream().map(review -> mapToDto(review)).collect(Collectors.toList());
     }
 
     @Override
     public ReviewDto getReviewById(int reviewId, int pokemonId) {
-        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> new PokemonNotFoundException("Pokemon with associated review not found"));
+        Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));
 
-        if(review.getPokemon().getId() != pokemon.getId()) {
+        if(review.getTour().getId() != tour.getId()) {
             throw new ReviewNotFoundException("This review does not belond to a pokemon");
         }
 
@@ -60,11 +61,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDto updateReview(int pokemonId, int reviewId, ReviewDto reviewDto) {
-        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> new PokemonNotFoundException("Pokemon with associated review not found"));
+        Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));
 
-        if(review.getPokemon().getId() != pokemon.getId()) {
+        if(review.getTour().getId() != tour.getId()) {
             throw new ReviewNotFoundException("This review does not belong to a pokemon");
         }
 
@@ -78,12 +79,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(int pokemonId, int reviewId) {
-        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(() -> new PokemonNotFoundException("Pokemon with associated review not found"));
+    public void deleteReview(int tourId, int reviewId) {
+        Tour tour = tourRepository.findById(tourId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));
 
-        if(review.getPokemon().getId() != pokemon.getId()) {
+        if(review.getTour().getId() != tour.getId()) {
             throw new ReviewNotFoundException("This review does not belong to a pokemon");
         }
 

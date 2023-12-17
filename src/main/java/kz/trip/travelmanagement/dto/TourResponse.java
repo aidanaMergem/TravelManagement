@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PokemonResponse {
-    private List<PokemonDto> content;
+public class TourResponse {
+    private List<TourDto> content;
     private int pageNo;
     private int pageSize;
     private long totalElements;

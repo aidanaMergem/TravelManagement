@@ -12,8 +12,8 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PokemonNotFoundException.class)
-    public ResponseEntity<ErrorObject> handlePokemonNotFoundException(PokemonNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(TourNotFoundException.class)
+    public ResponseEntity<ErrorObject> handlePokemonNotFoundException(TourNotFoundException ex, WebRequest request) {
 
         ErrorObject errorObject = new ErrorObject();
 
