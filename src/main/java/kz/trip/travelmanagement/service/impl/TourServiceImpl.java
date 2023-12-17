@@ -2,96 +2,181 @@ package kz.trip.travelmanagement.service.impl;
 
 import kz.trip.travelmanagement.dto.TourDto;
 import kz.trip.travelmanagement.dto.TourResponse;
-import kz.trip.travelmanagement.exceptions.TourNotFoundException;
 import kz.trip.travelmanagement.models.Tour;
+import kz.trip.travelmanagement.models.TourTranslation;
 import kz.trip.travelmanagement.repository.TourRepository;
 import kz.trip.travelmanagement.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TourServiceImpl implements TourService {
-    private TourRepository tourRepository;
+
+    private final TourRepository tourRepo;
 
     @Autowired
-    public TourServiceImpl(TourRepository tourRepository) {
-        this.tourRepository = tourRepository;
+    public TourServiceImpl(TourRepository tourRepo) {
+        this.tourRepo = tourRepo;
     }
 
     @Override
-    public TourDto createTour(TourDto tourDto) {
-        Tour tour = new Tour();
-        tour.setName(tourDto.getName());
-        tour.setType(tourDto.getType());
+    public List<TourDto> getAllTours(String lang) {
+        List<Tour> tours = tourRepo.findAll();
+        List<TourDto> tourDTOList = new ArrayList<>();
 
-        Tour newTour = tourRepository.save(tour);
+        for (Tour tour : tours) {
+            TourDto tourDTO = mapToDTO(tour, lang);
+            tourDTOList.add(tourDTO);
+        }
+        return tourDTOList;
+    }
 
-        TourDto pokemonResponse = new TourDto();
-        pokemonResponse.setId(newTour.getId());
-        pokemonResponse.setName(newTour.getName());
-        pokemonResponse.setType(newTour.getType());
-        return pokemonResponse;
+    @Override
+    public TourDto getTourById(long id, String lang) {
+        Tour tour = tourRepo.findById(id)
+                .orElseThrow();
+        return mapToDTO(tour, lang);
+    }
+
+    @Override
+    public Page<TourDto> getAllTours(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<TourDto> searchTours(String keyword, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public List<Tour> getToursByPagination(int pageNo, int pageSize) {
+        return null;
+    }
+
+
+    @Override
+    public TourDto updateTour( TourDto tourDTO,long id,  String language) {
+        Tour existingTour = tourRepo.findById(id)
+                .orElseThrow();
+
+        mapDTOToEntity(tourDTO, existingTour);
+
+        Tour updatedTour = tourRepo.save(existingTour);
+
+        return mapToDTO(updatedTour, language);
+    }
+
+
+    @Override
+    public void deleteTour(long id) {
+        Tour existingTour = tourRepo.findById(id)
+                .orElseThrow();
+
+        tourRepo.delete(existingTour);
+    }
+
+    @Override
+    public TourDto createTour(TourDto tourDTO) {
+        Tour tour = mapToEntity(tourDTO);
+        tourRepo.save(tour);
+        tourDTO.setId(tour.getId());
+
+        return tourDTO;
     }
 
     @Override
     public TourResponse getAllTour(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Tour> pokemons = tourRepository.findAll(pageable);
-        List<Tour> listOfTour = pokemons.getContent();
-        List<TourDto> content = listOfTour.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
-
-        TourResponse tourResponse = new TourResponse();
-        tourResponse.setContent(content);
-        tourResponse.setPageNo(pokemons.getNumber());
-        tourResponse.setPageSize(pokemons.getSize());
-        tourResponse.setTotalElements(pokemons.getTotalElements());
-        tourResponse.setTotalPages(pokemons.getTotalPages());
-        tourResponse.setLast(pokemons.isLast());
-
-        return tourResponse;
+        return null;
     }
 
-    @Override
-    public TourDto getTourById(int id) {
-        Tour tour = tourRepository.findById(id).orElseThrow(() -> new TourNotFoundException("Tour could not be found"));
-        return mapToDto(tour);
+
+
+
+    private TourDto mapToDTO(Tour tour, String language) {
+        TourDto tourDTO = new TourDto();
+        tourDTO.setId(tour.getId());
+        tourDTO.setTourName(tour.getTranslatedTourName(language));
+        tourDTO.setDescription(tour.getTranslatedDescription(language));
+        tourDTO.setTourType(tour.getTourType());
+        tourDTO.setDurationInDays(tour.getDurationInDays());
+        tourDTO.setPrice(tour.getPrice());
+        tourDTO.setStartDate(tour.getStartDate());
+        tourDTO.setCreatedAt(tour.getCreatedAt());
+        tourDTO.setModifiedAt(tour.getModifiedAt());
+        return tourDTO;
     }
 
-    @Override
-    public TourDto updateTour(TourDto tourDto, int id) {
-        Tour tour = tourRepository.findById(id).orElseThrow(() -> new TourNotFoundException("Tour could not be updated"));
-
-        tour.setName(tourDto.getName());
-        tour.setType(tourDto.getType());
-
-        Tour updatedTour = tourRepository.save(tour);
-        return mapToDto(updatedTour);
-    }
-
-    @Override
-    public void deleteTourId(int id) {
-        Tour tour = tourRepository.findById(id).orElseThrow(() -> new TourNotFoundException("Tour could not be delete"));
-        tourRepository.delete(tour);
-    }
-
-    private TourDto mapToDto(Tour tour) {
-        TourDto tourDto = new TourDto();
-        tourDto.setId(tour.getId());
-        tourDto.setName(tour.getName());
-        tourDto.setType(tour.getType());
-        return tourDto;
-    }
-
-    private Tour mapToEntity(TourDto tourDto) {
+    private Tour mapToEntity(TourDto tourDTO) {
         Tour tour = new Tour();
-        tour.setName(tourDto.getName());
-        tour.setType(tourDto.getType());
+        tour.setDurationInDays(tourDTO.getDurationInDays());
+        tour.setPrice(tourDTO.getPrice());
+        tour.setStartDate(tourDTO.getStartDate());
+        tour.setCreatedAt(LocalDateTime.now());
+        tour.setTranslations(tourDTO.getTranslations());
+
+        for(int i = 0; i < 3; i++){
+            TourTranslation translation = new TourTranslation();
+            translation.setLanguage(supportedLanguage.get(i));
+            translation.setTourName(tourDTO.getTranslations().get(i).getTourName());
+            translation.setDescription(tourDTO.getTranslations().get(i).getDescription());
+            tour.addTranslation(translation);
+        }
+
+        TourTranslation specifiedLanguageTranslation = getOrCreateTranslation(tour, supportedLanguage.get(0));
+        specifiedLanguageTranslation.setTourName(tourDTO.getTourName());
+        specifiedLanguageTranslation.setDescription(tourDTO.getDescription());
+
         return tour;
     }
+
+
+
+
+
+    private void mapDTOToEntity(TourDto tourDTO, Tour tour) {
+
+        tour.setDurationInDays(tourDTO.getDurationInDays());
+        tour.setPrice(tourDTO.getPrice());
+        tour.setStartDate(tourDTO.getStartDate());
+        tour.setModifiedAt(LocalDateTime.now());
+
+
+        for(int i = 0; i < 3; i++){
+            TourTranslation translation = tour.getTranslations().get(i);
+            translation.setLanguage(supportedLanguage.get(i));
+            translation.setTourName(tourDTO.getTranslations().get(i).getTourName());
+            translation.setDescription(tourDTO.getTranslations().get(i).getDescription());
+            tour.addTranslation(translation);
+        }
+        tour.setTranslations(tourDTO.getTranslations());
+        TourTranslation specifiedLanguageTranslation = getOrCreateTranslation(tour, supportedLanguage.get(0));
+        specifiedLanguageTranslation.setTourName(tourDTO.getTourName());
+        specifiedLanguageTranslation.setDescription(tourDTO.getDescription());
+
+
+    }
+
+    private TourTranslation getOrCreateTranslation(Tour tour, String language) {
+        return tour.getTranslations().stream()
+                .filter(t -> t.getLanguage().equals(language))
+                .findFirst()
+                .orElseGet(() -> {
+                    TourTranslation newTranslation = new TourTranslation();
+                    newTranslation.setLanguage(language);
+                    newTranslation.setTour(tour);
+                    tour.getTranslations().add(newTranslation);
+                    return newTranslation;
+                });
+    }
+
+    private List<String> supportedLanguage = List.of("en", "ru", "kz"); // Example languages
+
 }

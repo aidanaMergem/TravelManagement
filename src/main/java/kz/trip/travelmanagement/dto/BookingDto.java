@@ -13,10 +13,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class BookingDto {
-    private int id;
-    private int tourId;
-    private int userId;
+    private long id;
+    private long tourId;
+    private String tourName;
+    private long userId;
+    private String userName;
     private Date bookingDateTime;
-    private BookingStatus bookingStatus;
+    private String bookingStatusValue;
 
 }

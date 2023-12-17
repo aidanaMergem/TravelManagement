@@ -5,12 +5,17 @@ import kz.trip.travelmanagement.dto.TourDto;
 import kz.trip.travelmanagement.dto.TourResponse;
 import kz.trip.travelmanagement.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Locale;
+
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api/tours")
 public class TourController {
 
     private TourService tourService;
@@ -20,35 +25,35 @@ public class TourController {
         this.tourService = tourService;
     }
 
-    @GetMapping("tour")
-    public ResponseEntity<TourResponse> getTours(
-            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
-    ) {
-        return new ResponseEntity<>(tourService.getAllTour(pageNo, pageSize), HttpStatus.OK);
+    @GetMapping("/")
+    public ResponseEntity<List<TourDto>> getAllTours(
+            @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, defaultValue = "en") String language) {
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        List<TourDto> tours = tourService.getAllTours(currentLocale.getLanguage());
+        return ResponseEntity.ok(tours);
     }
 
-    @GetMapping("tour/{id}")
-    public ResponseEntity<TourDto> tourDetail(@PathVariable int id) {
-        return ResponseEntity.ok(tourService.getTourById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<TourDto> tourDetail(@PathVariable int id, @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, defaultValue = "en") String language) {
+        return ResponseEntity.ok(tourService.getTourById(id, language));
 
     }
 
-    @PostMapping("tour/create")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<TourDto> createTour(@RequestBody TourDto tourDto) {
         return new ResponseEntity<>(tourService.createTour(tourDto), HttpStatus.CREATED);
     }
 
-    @PutMapping("tour/{id}/update")
-    public ResponseEntity<TourDto> updateTour(@RequestBody TourDto tourDto, @PathVariable("id") int tourId) {
-        TourDto response = tourService.updateTour(tourDto, tourId);
+    @PutMapping("/{id}")
+    public ResponseEntity<TourDto> updateTour(@RequestBody TourDto tourDto, @PathVariable("id") int tourId, @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, defaultValue = "en") String language) {
+        TourDto response = tourService.updateTour(tourDto, tourId, language);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("tour/{id}/delete")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTour(@PathVariable("id") int tourId) {
-        tourService.deleteTourId(tourId);
+        tourService.deleteTour(tourId);
         return new ResponseEntity<>("Tour delete", HttpStatus.OK);
     }
 

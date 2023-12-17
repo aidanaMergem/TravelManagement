@@ -20,30 +20,30 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @PostMapping("/tour/{tourId}/reviews")
+    @PostMapping("/tours/{tourId}/reviews")
     public ResponseEntity<ReviewDto> createReview(@PathVariable(value = "tourId") int tourId, @RequestBody ReviewDto reviewDto) {
         return new ResponseEntity<>(reviewService.createReview(tourId, reviewDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/tour/{tourId}/reviews")
+    @GetMapping("/tours/{tourId}/reviews")
     public List<ReviewDto> getReviewsByTourId(@PathVariable(value = "tourId") int tourId) {
         return reviewService.getReviewsByTourId(tourId);
     }
 
-    @GetMapping("/tour/{tourId}/reviews/{id}")
+    @GetMapping("/tours/{tourId}/reviews/{id}")
     public ResponseEntity<ReviewDto> getReviewById(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "id") int reviewId) {
         ReviewDto reviewDto = reviewService.getReviewById(tourId, reviewId);
         return new ResponseEntity<>(reviewDto, HttpStatus.OK);
     }
 
-    @PutMapping("/tour/{tourId}/reviews/{id}")
+    @PutMapping("/tours/{tourId}/reviews/{id}")
     public ResponseEntity<ReviewDto> updateReview(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "id") int reviewId,
                                                   @RequestBody ReviewDto reviewDto) {
         ReviewDto updatedReview = reviewService.updateReview(tourId, reviewId, reviewDto);
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 
-    @DeleteMapping("/tour/{tourId}/reviews/{id}")
+    @DeleteMapping("/tours/{tourId}/reviews/{id}")
     public ResponseEntity<String> deleteReview(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "id") int reviewId) {
         reviewService.deleteReview(tourId, reviewId);
         return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);

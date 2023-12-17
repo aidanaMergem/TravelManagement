@@ -27,7 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto createReview(int pokemonId, ReviewDto reviewDto) {
+    public ReviewDto createReview(long pokemonId, ReviewDto reviewDto) {
         Review review = mapToEntity(reviewDto);
 
         Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
@@ -40,14 +40,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDto> getReviewsByTourId(int id) {
+    public List<ReviewDto> getReviewsByTourId(long id) {
         List<Review> reviews = reviewRepository.findByTourId(id);
 
         return reviews.stream().map(review -> mapToDto(review)).collect(Collectors.toList());
     }
 
     @Override
-    public ReviewDto getReviewById(int reviewId, int pokemonId) {
+    public ReviewDto getReviewById(long reviewId, long pokemonId) {
         Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));
@@ -60,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto updateReview(int pokemonId, int reviewId, ReviewDto reviewDto) {
+    public ReviewDto updateReview(long pokemonId, long reviewId, ReviewDto reviewDto) {
         Tour tour = tourRepository.findById(pokemonId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));
@@ -79,7 +79,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(int tourId, int reviewId) {
+    public void deleteReview(long tourId, long reviewId) {
         Tour tour = tourRepository.findById(tourId).orElseThrow(() -> new TourNotFoundException("Pokemon with associated review not found"));
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("Review with associate pokemon not found"));

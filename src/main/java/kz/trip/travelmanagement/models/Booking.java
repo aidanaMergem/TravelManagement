@@ -16,7 +16,7 @@ import java.util.Date;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "tour_id")
@@ -27,5 +27,8 @@ public class Booking {
     private UserEntity user;
 
     private Date bookingDateTime;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "booking_status_id")
+    private BookingStatus bookingStatus;
 
 }

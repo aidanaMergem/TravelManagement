@@ -20,12 +20,26 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @PostMapping("/tours/{tourId}/users/{userId}/bookings")
-    public ResponseEntity<BookingDto> createBooking(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "userId") int userId,
-                                                    @RequestBody BookingDto bookingDto) {
-        return new ResponseEntity<>(bookingService.createBooking(tourId, userId, bookingDto), HttpStatus.CREATED);
+    @GetMapping("/bookings")
+    public List<BookingDto> showAllBookings() {
+        return bookingService.getAllBookings();
     }
 
+    @GetMapping("/bookings/{id}/changeStatus")
+    public BookingDto changeBookingStatus(@RequestParam String status, @PathVariable(value = "id")  int id) {
+        return bookingService.changeBookingStatus(id, status);
+    }
+
+
+    @PostMapping("/tours/{tourId}/users/{userId}/book")
+    public ResponseEntity<BookingDto> createBooking(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "userId") int userId) {
+        return new ResponseEntity<>(bookingService.createBooking(tourId, userId), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/tours/{tourId}/users/{userId}/bookTour")
+    public ResponseEntity<BookingDto> bookTour(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "userId") int userId) {
+        return new ResponseEntity<>(bookingService.createBooking(tourId, userId), HttpStatus.CREATED);
+    }
     @GetMapping("/users/{userId}/bookings")
     public List<BookingDto> getBookingsByUserId(@PathVariable(value = "userId") int userId) {
         return bookingService.getBookingsByUserId(userId);

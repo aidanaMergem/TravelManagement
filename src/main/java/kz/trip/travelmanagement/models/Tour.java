@@ -21,7 +21,7 @@ import java.util.Set;
 public class Tour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<TourTranslation> translations = new ArrayList<>();
@@ -35,6 +35,7 @@ public class Tour {
     private List<Booking> reviews = new ArrayList<Booking>();
 
 
+
     public String getTranslatedTourName(String language) {
         return getTranslation(language, "tourName");
     }
@@ -44,23 +45,20 @@ public class Tour {
         return getTranslation(language, "description");
     }
 
-    // Common method to fetch translation based on language and field
     private String getTranslation(String language, String fieldName) {
         return translations.stream()
                 .filter(translation -> language.equals(translation.getLanguage()))
                 .findFirst()
                 .map(translation -> getFieldByPropertyName(fieldName, translation))
-                .orElse(fieldName.equals("tourName") ? "" : null); // Return empty string for tourName if not found, null for other fields
+                .orElse(fieldName.equals("tourName") ? "" : null);
     }
 
-    // Helper method to get the field value by property name
     private String getFieldByPropertyName(String fieldName, TourTranslation translation) {
         switch (fieldName) {
             case "tourName":
                 return translation.getTourName();
             case "description":
                 return translation.getDescription();
-            // Add more cases for additional fields if needed
             default:
                 return null;
         }
