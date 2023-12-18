@@ -1,8 +1,10 @@
 package kz.trip.travelmanagement.security;
 
+import kz.trip.travelmanagement.exceptions.NoAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -40,11 +42,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/tours/**").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/tours/**").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/tours/**").hasAuthority("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions ->
                         exceptions
                                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                    throw new NoAccessException("You are not authorized for this page");
+                                })
                 )
                 .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();

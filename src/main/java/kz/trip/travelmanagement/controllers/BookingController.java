@@ -5,9 +5,11 @@ import kz.trip.travelmanagement.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/")
@@ -20,15 +22,18 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
+
     @GetMapping("/bookings")
     public List<BookingDto> showAllBookings() {
         return bookingService.getAllBookings();
     }
 
+
     @GetMapping("/bookings/{id}/changeStatus")
     public BookingDto changeBookingStatus(@RequestParam String status, @PathVariable(value = "id")  int id) {
         return bookingService.changeBookingStatus(id, status);
     }
+
 
 
     @PostMapping("/tours/{tourId}/users/{userId}/book")

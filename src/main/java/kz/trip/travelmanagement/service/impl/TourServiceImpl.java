@@ -2,6 +2,8 @@ package kz.trip.travelmanagement.service.impl;
 
 import kz.trip.travelmanagement.dto.TourDto;
 import kz.trip.travelmanagement.dto.TourResponse;
+import kz.trip.travelmanagement.exceptions.BookingNotFoundException;
+import kz.trip.travelmanagement.exceptions.TourNotFoundException;
 import kz.trip.travelmanagement.models.Tour;
 import kz.trip.travelmanagement.models.TourTranslation;
 import kz.trip.travelmanagement.repository.TourRepository;
@@ -42,7 +44,7 @@ public class TourServiceImpl implements TourService {
     @Override
     public TourDto getTourById(long id, String lang) {
         Tour tour = tourRepo.findById(id)
-                .orElseThrow();
+                .orElseThrow(()->new BookingNotFoundException("No such booking"));
         return mapToDTO(tour, lang);
     }
 
@@ -78,10 +80,15 @@ public class TourServiceImpl implements TourService {
     @Override
     public void deleteTour(long id) {
         Tour existingTour = tourRepo.findById(id)
-                .orElseThrow();
+                .orElseThrow(()-> new TourNotFoundException("Tour not found!"));
 
+        // Remove all associated Booking entities
+        existingTour.getReviews().clear();
+
+        // Now you can safely delete the Tour
         tourRepo.delete(existingTour);
     }
+
 
     @Override
     public TourDto createTour(TourDto tourDTO) {

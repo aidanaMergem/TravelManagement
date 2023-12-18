@@ -54,14 +54,12 @@ public class TourSearchingController {
                 pageTours = tourRepo.findByTranslationsTourNameContaining(keyword, pagingSort);
             }
 
-
             List<Tour> tours = pageTours.getContent();
 
             // Convert Tour entities to TourDTO
             List<TourDto> tourDTOs = tours.stream()
                     .map(tour -> convertToDTO(tour, language))
                     .collect(Collectors.toList());
-
 
             Map<String, Object> response = new HashMap<>();
             response.put("tours", tourDTOs);
@@ -70,8 +68,7 @@ public class TourSearchingController {
             response.put("totalPages", pageTours.getTotalPages());
 
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace(); // Log the exception stack trace
+        }catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

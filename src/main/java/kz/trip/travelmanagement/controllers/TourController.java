@@ -9,10 +9,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
+
+
 
 @RestController
 @RequestMapping("/api/tours")
@@ -25,6 +28,8 @@ public class TourController {
         this.tourService = tourService;
     }
 
+
+
     @GetMapping("/")
     public ResponseEntity<List<TourDto>> getAllTours(
             @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, defaultValue = "en") String language) {
@@ -32,6 +37,8 @@ public class TourController {
         List<TourDto> tours = tourService.getAllTours(currentLocale.getLanguage());
         return ResponseEntity.ok(tours);
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TourDto> tourDetail(@PathVariable int id, @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, defaultValue = "en") String language) {
@@ -54,7 +61,10 @@ public class TourController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTour(@PathVariable("id") int tourId) {
         tourService.deleteTour(tourId);
-        return new ResponseEntity<>("Tour delete", HttpStatus.OK);
+        return new ResponseEntity<>("Tour deleted", HttpStatus.OK);
     }
+
+
+
 
 }
